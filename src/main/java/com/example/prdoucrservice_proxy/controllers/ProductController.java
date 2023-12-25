@@ -1,6 +1,9 @@
 package com.example.prdoucrservice_proxy.controllers;
 
+import com.example.prdoucrservice_proxy.clients.IClientProductDto;
+import com.example.prdoucrservice_proxy.clients.fakestore.dto.FakeStoreProductDto;
 import com.example.prdoucrservice_proxy.dtos.ProductDto;
+import com.example.prdoucrservice_proxy.models.Categories;
 import com.example.prdoucrservice_proxy.models.Product;
 import com.example.prdoucrservice_proxy.services.IProductService;
 import org.springframework.http.HttpStatus;
@@ -39,8 +42,33 @@ public class ProductController {
     }
     @PostMapping
     public ResponseEntity<Product> addNewProduct(@RequestBody ProductDto productDto){
-        Product product = this.productService.addNewProduct(productDto);
-        ResponseEntity<Product> responseEntity = new ResponseEntity<>(product,HttpStatus.OK);
+        Product product = getProduct(productDto);
+        Product saveProduct = this.productService.addNewProduct(product);
+        ResponseEntity<Product> responseEntity = new ResponseEntity<>(saveProduct,HttpStatus.OK);
         return responseEntity;
+    }
+    @PatchMapping("/{productId}")
+    public Product patchProduct(@PathVariable("productId") Long productId, @RequestBody ProductDto productDto) {
+
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setCategory(new Categories());
+        product.getCategory().setName(productDto.getCategory());
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
+        product.setDescription(productDto.getDescription());
+        return this.productService.updateProduct(productId, product);
+    }
+    private  Product getProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setTitle(productDto.getTitle());
+        product.setDescription((productDto.getDescription()));
+        product.setPrice((productDto.getPrice()));
+        Categories category = new Categories();
+        category.setName((productDto.getCategory()));
+        product.setCategory(category);
+        product.setImageUrl(productDto.getImageUrl());
+        return product;
     }
 }

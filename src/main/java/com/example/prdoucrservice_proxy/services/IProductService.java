@@ -1,5 +1,6 @@
 package com.example.prdoucrservice_proxy.services;
 
+import com.example.prdoucrservice_proxy.clients.IClientProductDto;
 import com.example.prdoucrservice_proxy.dtos.ProductDto;
 import com.example.prdoucrservice_proxy.models.Product;
 
@@ -10,9 +11,11 @@ public interface IProductService {
 
     Product getSingleProduct(Long productId);
 
-    Product addNewProduct(ProductDto product);
+   // Product addNewProduct(IClientProductDto product);
 
-    String updateProduct(Long productId);
+    Product addNewProduct(Product product);
+
+    Product updateProduct(Long productId, Product product);
 
     String deleteProduct(Long productId);
 }
