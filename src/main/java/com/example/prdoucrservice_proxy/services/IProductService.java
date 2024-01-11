@@ -3,6 +3,7 @@ package com.example.prdoucrservice_proxy.services;
 import com.example.prdoucrservice_proxy.clients.IClientProductDto;
 import com.example.prdoucrservice_proxy.dtos.ProductDto;
 import com.example.prdoucrservice_proxy.models.Product;
+import com.example.prdoucrservice_proxy.security.JwtObject;
 
 import java.util.List;
 

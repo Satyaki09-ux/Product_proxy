@@ -5,21 +5,28 @@ import com.example.prdoucrservice_proxy.clients.fakestore.dto.FakeStoreProductDt
 import com.example.prdoucrservice_proxy.dtos.ProductDto;
 import com.example.prdoucrservice_proxy.models.Categories;
 import com.example.prdoucrservice_proxy.models.Product;
+import com.example.prdoucrservice_proxy.security.JwtObject;
+import com.example.prdoucrservice_proxy.security.TokenValidator;
 import com.example.prdoucrservice_proxy.services.IProductService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
     IProductService productService;
-    public ProductController(IProductService productService){
+    TokenValidator tokenValidator;
+    public ProductController(IProductService productService,TokenValidator tokenValidator){
         this.productService = productService;
+        this.tokenValidator = tokenValidator;
     }
     @GetMapping("")
     public List<Product> getAllProducts(){
@@ -27,13 +34,23 @@ public class ProductController {
         return this.productService.getAllProducts();
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") Long productId ) {
+    public ResponseEntity<Product> getSingleProduct(@Nullable @RequestHeader(HttpHeaders.AUTHORIZATION) String authToken
+            , @PathVariable("id") Long productId ) {
        try {
+           JwtObject authTokenObj =null;
+           if (authToken != null){
+               Optional<JwtObject> authObject = tokenValidator.validateToken(authToken);
+               if(authObject.isEmpty()){
+                   //throw exception
+               }
+               authTokenObj = authObject.get();
+           }
            MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
            headers.add("Accept","application/json");
            headers.add("Content-Type","application/json");
            headers.add("auth-token","heyaccess");
            Product product = productService.getSingleProduct(productId);
+           //Product product = productService.getSingleProduct(productId,authTokenObj);
            ResponseEntity<Product> responseEntity = new ResponseEntity<>(product,headers, HttpStatus.OK);
            return responseEntity;
        }catch(Exception e){
